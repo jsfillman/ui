@@ -31,6 +31,7 @@ import {
   getParams,
   generatePathWithSearchParams,
 } from '../../features/params/paramsSlice';
+import NarrativeViewItem from './NarrativeList/NarrativeViewItem';
 import { corruptCellError, searchParams } from './common';
 import { useCells } from './hooks';
 import { cellsLoaded, narrativeDocsLookup, wsObjects } from './navigatorSlice';
@@ -44,9 +45,19 @@ const sanitize = (markdown: string) =>
   });
 
 const NarrativeControlMenu = PlaceholderFactory('NarrativeVersionControlMenu');
-const NarrativeVersionSelection = PlaceholderFactory(
-  'NarrativeVersionSelection'
-);
+
+const NarrativeVersionSelection: FC<{ narrativeDoc: NarrativeDoc }> = ({
+  narrativeDoc,
+}) => {
+  return (
+    <NarrativeViewItem
+      activeOverride={true}
+      idx={0}
+      item={narrativeDoc}
+      showVersionDropdown={true}
+    />
+  );
+};
 
 const NarrativeViewTabs: FC<{
   view: string;
@@ -254,8 +265,8 @@ const NarrativeView: FC<{
         <>
           <div>
             <div className={classes.control}>
-              <NarrativeVersionSelection narrativeUPA={narrativeUPA} />
-              <NarrativeControlMenu narrativeUPA={narrativeUPA} />
+              <NarrativeVersionSelection narrativeDoc={narrativeDocFound} />
+              <NarrativeControlMenu />
             </div>
             <NarrativeMetadata cells={cells} narrativeDoc={narrativeDocFound} />
             <NarrativeViewTabs view={view} />

@@ -13,11 +13,18 @@ export interface NarrativeViewItemProps {
   idx: number;
   item: NarrativeDoc;
   showVersionDropdown: boolean;
+  activeOverride?: boolean;
   onSelectItem?: (idx: number) => void;
   onUpaChange?: (upa: string) => void;
 }
 
+/*
+TODO: Version selection should only show up when the specific doc is selected.
+This is true in the narrative listing when no doc is specified, and at least
+one exists. This is always true for the NarrativeView component.
+*/
 const NarrativeViewItem: FC<NarrativeViewItemProps> = ({
+  activeOverride,
   idx,
   item,
   onUpaChange,
@@ -33,8 +40,10 @@ const NarrativeViewItem: FC<NarrativeViewItemProps> = ({
   const { access_group, creator, narrative_title, obj_id, timestamp, version } =
     item;
   const upa = `${access_group}/${obj_id}/${version}`;
-  const active =
-    access_group.toString() === id && obj_id.toString() === obj && ver;
+  // eslint-disable-next-line no-console
+  console.log({ item });
+  // const versionActive = Number(ver) > 0 ? Number(ver) : version;
+  const active = access_group.toString() === id && obj_id.toString() === obj;
   const status = active ? 'active' : 'inactive';
   // Note: timeago expects milliseconds
   const timeElapsed = timeago.format(timestamp);
@@ -56,7 +65,7 @@ const NarrativeViewItem: FC<NarrativeViewItemProps> = ({
     });
   };
 
-  const pathVersion = active ? +ver : version;
+  const pathVersion = active ? Number(ver) : version;
   const path = narrativeViewItemPath(pathVersion);
   return (
     <section key={idx}>
