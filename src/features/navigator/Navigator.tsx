@@ -23,6 +23,7 @@ import {
   isSortString,
   navigatorPath,
   navigatorPathWithCategory,
+  normalizeVersion,
   searchParams,
 } from './common';
 import { useNarratives } from './hooks';
@@ -35,10 +36,10 @@ import {
 } from './navigatorSlice';
 import NarrativeList from './NarrativeList/NarrativeList';
 import NarrativeView from './NarrativeView';
-import classes from './Navigator.module.scss';
 import RefreshButton from './RefreshButton';
 import SearchInput from './SearchInput';
 import SortSelect from './SortSelect';
+import classes from './Navigator.module.scss';
 
 const NarrativeNewButton: FC = () => (
   <a href="/#narrativemanager/new" rel="noopener noreferrer" target="_blank">
@@ -138,7 +139,7 @@ const MainContainer: FC<{
   );
 };
 
-const emptyItem = { access_group: 0, obj_id: 0, version: 0 } as const;
+const emptyItem = { access_group: 0, obj_id: 1, version: 1 } as const;
 const searchParamDefaults = {
   limit: '20',
   search: '',
@@ -151,17 +152,18 @@ const narrativesByAccessGroup = (narratives: NarrativeDoc[]) => {
   );
 };
 const getNarrativeSelected = (parameters: {
-  id: string | undefined;
-  obj: string | undefined;
-  ver: string | undefined;
+  id?: string;
+  obj?: string;
+  verRaw?: string;
   items: NarrativeDoc[];
 }) => {
-  const { id, obj, ver, items } = parameters;
+  const { id, obj, verRaw, items } = parameters;
   const narrativesLookup = narrativesByAccessGroup(items);
   const firstItem = items.length ? items[0] : emptyItem;
   const { access_group, obj_id, version } =
     id && id in narrativesLookup ? narrativesLookup[id] : firstItem;
   const upa = `${access_group}/${obj_id}/${version}`;
+  const ver = Math.min(Number(normalizeVersion(verRaw)), version);
   return id && obj && ver ? `${id}/${obj}/${ver}` : upa;
 };
 // Navigator component
@@ -169,7 +171,7 @@ const Navigator: FC = () => {
   /* general hooks */
   usePageTitle('Narrative Navigator');
   const loc = useLocation();
-  const { category, id, obj, ver } = useParams();
+  const { category, id, obj, ver: verRaw } = useParams();
   const categoryFilter =
     category && isCategoryString(category)
       ? Category[category]
@@ -199,7 +201,7 @@ const Navigator: FC = () => {
     username,
   });
   const items = useAppSelector(narrativeDocs);
-  const narrativeSelected = getNarrativeSelected({ id, obj, ver, items });
+  const narrativeSelected = getNarrativeSelected({ id, obj, verRaw, items });
   // hooks that update state
   useEffect(() => {
     dispatch(setCategory(categoryFilter));
