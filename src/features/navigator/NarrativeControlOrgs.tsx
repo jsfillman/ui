@@ -1,10 +1,16 @@
 /* NarrativeControlOrgs */
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
+import { getNarrativeOrgs } from '../../common/api/orgsApi';
 import { Button } from '../../common/components';
 import { inputRegisterFactory } from '../../common/components/Input.common';
 import { Input } from '../../common/components/Input';
 import { NarrativeDoc } from '../../common/types/NarrativeDoc';
+
+export interface OrgIdentity {
+  id: string;
+  name: string;
+}
 
 export interface OrgsValues {
   narrativeOrgs: string[];
@@ -25,6 +31,9 @@ export const Orgs: FC<{
     formState,
     register,
   });
+  const orgs = getNarrativeOrgs.useQuery(narrativeDoc.access_group);
+  // eslint-disable-next-line no-console
+  console.log({ orgs });
   return (
     <>
       <p>Organizations</p>
