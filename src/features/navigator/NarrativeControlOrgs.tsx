@@ -1,16 +1,8 @@
 /* NarrativeControlOrgs */
-import { FC } from 'react';
-import { useForm } from 'react-hook-form';
-import { getNarrativeOrgs } from '../../common/api/orgsApi';
-import { Button } from '../../common/components';
-import { inputRegisterFactory } from '../../common/components/Input.common';
-import { Input } from '../../common/components/Input';
+import { FC, useId } from 'react';
+import { getNarrativeOrgs, getUserOrgs } from '../../common/api/orgsApi';
+import { Button, Select } from '../../common/components';
 import { NarrativeDoc } from '../../common/types/NarrativeDoc';
-
-export interface OrgIdentity {
-  id: string;
-  name: string;
-}
 
 export interface OrgsValues {
   narrativeOrgs: string[];
@@ -19,33 +11,27 @@ export interface OrgsValues {
 export const Orgs: FC<{
   narrativeDoc: NarrativeDoc;
   no: () => void;
-  yesFactory: ({ getValues }: { getValues: () => OrgsValues }) => () => void;
-}> = ({ narrativeDoc, no, yesFactory }) => {
-  const { formState, getValues, register } = useForm<OrgsValues>({
-    defaultValues: {
-      narrativeOrgs: [],
-    },
-    mode: 'all',
-  });
-  const inputRegister = inputRegisterFactory<OrgsValues>({
-    formState,
-    register,
-  });
+  yes: ({ id }: { id: string }) => () => void;
+}> = ({ narrativeDoc, no, yes }) => {
   const orgs = getNarrativeOrgs.useQuery(narrativeDoc.access_group);
+  const userOrgs = getUserOrgs.useQuery();
   // eslint-disable-next-line no-console
-  console.log({ orgs });
+  console.log({ orgs, userOrgs });
+  const orgSelectId = useId();
+  if (!userOrgs.currentData) return <></>;
   return (
     <>
       <p>Organizations</p>
 
       <div>
-        <Input
-          label={<>New Organization </>}
-          {...inputRegister('narrativeOrgs', {
-            /* validations */
-          })}
+        <label htmlFor={orgSelectId}>New Organization</label>
+        <Select
+          options={userOrgs.currentData.map(({ name }) => ({
+            value: name,
+            label: name,
+          }))}
         />
-        <Button onClick={yesFactory({ getValues })}>OK</Button>
+        <Button onClick={yes({ id: orgSelectId })}>OK</Button>
         <Button onClick={no}>Cancel</Button>
       </div>
     </>

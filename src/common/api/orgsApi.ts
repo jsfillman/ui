@@ -4,7 +4,7 @@ import { httpService } from './utils/serviceHelpers';
 import { baseApi } from './index';
 
 const orgsService = httpService({
-  url: '/services/groups/rpc',
+  url: '/services/groups/',
 });
 
 export interface OrgInfo {
@@ -15,12 +15,19 @@ export interface OrgInfo {
   private: boolean;
 }
 
+export interface OrgMemberInfo {
+  id: string;
+  name: string;
+}
+
 export interface OrgsParams {
   getNarrativeOrgs: number;
+  getUserOrgs: void;
 }
 
 export interface OrgsResults {
   getNarrativeOrgs: OrgInfo[];
+  getUserOrgs: OrgMemberInfo[];
 }
 
 export const orgsApi = baseApi
@@ -37,8 +44,19 @@ export const orgsApi = baseApi
           providesTags: ['Orgs'],
         }
       ),
+      getUserOrgs: builder.query<
+        OrgsResults['getUserOrgs'],
+        OrgsParams['getUserOrgs']
+      >({
+        query: () =>
+          orgsService({
+            method: 'GET',
+            url: '/member',
+          }),
+        providesTags: ['Orgs'],
+      }),
     }),
   });
 
-export const { getNarrativeOrgs } = orgsApi.endpoints;
+export const { getNarrativeOrgs, getUserOrgs } = orgsApi.endpoints;
 export const clearCacheAction = orgsApi.util.invalidateTags(['Orgs']);
