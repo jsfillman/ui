@@ -34,16 +34,17 @@ export const orgsApi = baseApi
   .enhanceEndpoints({ addTagTypes: ['Orgs'] })
   .injectEndpoints({
     endpoints: (builder) => ({
-      getNarrativeOrgs: builder.query<string[], OrgsParams['getNarrativeOrgs']>(
-        {
-          query: (id) =>
-            orgsService({
-              method: 'GET',
-              url: encode`/group?resourcetype=workspace&resource=${id}`,
-            }),
-          providesTags: ['Orgs'],
-        }
-      ),
+      getNarrativeOrgs: builder.query<
+        OrgInfo[],
+        OrgsParams['getNarrativeOrgs']
+      >({
+        query: (id) =>
+          orgsService({
+            method: 'GET',
+            url: encode`/group?resourcetype=workspace&resource=${id}`,
+          }),
+        providesTags: ['Orgs'],
+      }),
       getUserOrgs: builder.query<
         OrgsResults['getUserOrgs'],
         OrgsParams['getUserOrgs']

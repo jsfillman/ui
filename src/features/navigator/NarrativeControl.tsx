@@ -99,14 +99,10 @@ const ControlLatest: FC<ControlLatestProps> = ({ narrativeDoc }) => {
     await deleteNarrative(access_group);
     modalClose();
   };
-  const orgsYes =
-    ({ id }: { id: string }) =>
+  const orgsYesFactory =
+    ({ orgSelected }: { orgSelected: string }) =>
     async () => {
-      const orgsSelect = document.getElementById(id);
-      if (!orgsSelect || !(orgsSelect instanceof HTMLSelectElement)) {
-        return console.log('DOM ERR'); // eslint-disable-line no-console
-      }
-      await linkNarrative(narrativeDoc.access_group, orgsSelect.value);
+      await linkNarrative(narrativeDoc.access_group, orgSelected);
       modalClose();
     };
   const renameYesFactory =
@@ -128,7 +124,11 @@ const ControlLatest: FC<ControlLatestProps> = ({ narrativeDoc }) => {
     ),
     Delete: <Delete no={modalClose} yes={deleteYes} />,
     'Link to Organization': (
-      <Orgs narrativeDoc={narrativeDoc} no={modalClose} yes={orgsYes} />
+      <Orgs
+        narrativeDoc={narrativeDoc}
+        no={modalClose}
+        yesFactory={orgsYesFactory}
+      />
     ),
     'Manage Sharing': <>Manage Sharing</>,
     Rename: (
