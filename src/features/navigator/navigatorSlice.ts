@@ -6,6 +6,7 @@ import {
   NarrativeDoc,
 } from '../../common/types/NarrativeDoc';
 import { SearchResults } from '../../common/api/searchApi';
+import { OrgInfo } from '../../common/api/orgsApi';
 import { Category } from './common';
 
 // Define a type for the slice state
@@ -14,6 +15,9 @@ interface NavigatorState {
   cells: Cell[];
   cellsLoaded: boolean;
   count: number;
+  controlMenu: {
+    linkedOrgs: OrgInfo[];
+  };
   narrativeDocs: NarrativeDoc[];
   narrativeDocsLookup: Record<number, NarrativeDoc>;
   search_time: number;
@@ -27,6 +31,9 @@ const initialState: NavigatorState = {
   category: Category['own'],
   cells: [],
   cellsLoaded: false,
+  controlMenu: {
+    linkedOrgs: [],
+  },
   count: 0,
   narrativeDocs: [],
   narrativeDocsLookup: {},
@@ -41,6 +48,13 @@ export const navigatorSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
+    linkNarrative: (
+      state,
+      action: PayloadAction<{ org: string; wsId: number }>
+    ) => {
+      const message = `Link ${action.payload.wsId} to ${action.payload.org}.`;
+      console.log(message); // eslint-disable-line no-console
+    },
     select: (state, action: PayloadAction<NavigatorState['selected']>) => {
       state.selected = action.payload;
     },
@@ -78,6 +92,7 @@ export const navigatorSlice = createSlice({
 
 export default navigatorSlice.reducer;
 export const {
+  linkNarrative,
   select,
   setCategory,
   setCells,

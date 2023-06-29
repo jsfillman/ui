@@ -47,17 +47,6 @@ const deleteNarrative = async (wsId: number) => {
   });
 };
 
-const linkNarrative = async (wsId: number, narrativeOrg: string) => {
-  const message = `Link ${wsId} to ${narrativeOrg}.`;
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // eslint-disable-next-line no-console
-      console.log(message);
-      resolve(message);
-    }, 1000);
-  });
-};
-
 const renameNarrative = async (wsId: number, name: string) => {
   const message = `Rename ${wsId} to ${name}.`;
   return new Promise((resolve) => {
@@ -99,12 +88,6 @@ const ControlLatest: FC<ControlLatestProps> = ({ narrativeDoc }) => {
     await deleteNarrative(access_group);
     modalClose();
   };
-  const orgsYesFactory =
-    ({ orgSelected }: { orgSelected: string }) =>
-    async () => {
-      await linkNarrative(narrativeDoc.access_group, orgSelected);
-      modalClose();
-    };
   const renameYesFactory =
     ({ getValues }: { getValues: () => RenameValues }) =>
     async () => {
@@ -124,11 +107,7 @@ const ControlLatest: FC<ControlLatestProps> = ({ narrativeDoc }) => {
     ),
     Delete: <Delete no={modalClose} yes={deleteYes} />,
     'Link to Organization': (
-      <Orgs
-        narrativeDoc={narrativeDoc}
-        no={modalClose}
-        yesFactory={orgsYesFactory}
-      />
+      <Orgs narrativeDoc={narrativeDoc} no={modalClose} />
     ),
     'Manage Sharing': <>Manage Sharing</>,
     Rename: (

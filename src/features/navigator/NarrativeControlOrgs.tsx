@@ -8,7 +8,9 @@ import {
   OrgInfo,
 } from '../../common/api/orgsApi';
 import { Button, Select } from '../../common/components';
+import { useAppDispatch } from '../../common/hooks';
 import { NarrativeDoc } from '../../common/types/NarrativeDoc';
+import { linkNarrative } from './navigatorSlice';
 
 export interface OrgsValues {
   narrativeOrgs: string[];
@@ -17,9 +19,11 @@ export interface OrgsValues {
 export const Orgs: FC<{
   narrativeDoc: NarrativeDoc;
   no: () => void;
-  yesFactory: ({ orgSelected }: { orgSelected: string }) => () => void;
+  yesFactory?: ({ orgSelected }: { orgSelected: string }) => () => void;
 }> = ({ narrativeDoc, no, yesFactory }) => {
+  const dispatch = useAppDispatch();
   const [orgSelected, setOrgSelected] = useState('');
+  const modalClose = no;
   const narrativeOrgsQuery = getNarrativeOrgs.useQuery(
     narrativeDoc.access_group
   );
@@ -37,11 +41,19 @@ export const Orgs: FC<{
   const narrativeOrgs = narrativeOrgsQuery.currentData;
   console.log({ narrativeOrgs }); // eslint-disable-line no-console
 
-  /*
-  const OrgInfos: FC<{ orgInfo: OrgInfo }> = ({ orgInfo }) => {
-    return <li>{orgInfo.name}</li>;
-  };
-  */
+  const linkOrg =
+    ({ orgSelected }: { orgSelected: string }) =>
+    async () => {
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
+      dispatch(
+        linkNarrative({ org: orgSelected, wsId: narrativeDoc.access_group })
+      );
+      modalClose();
+    };
   return (
     <>
       <p>Organizations</p>
@@ -66,15 +78,15 @@ export const Orgs: FC<{
             <p>Organizations this Narrative is linked to:</p>
             <ul>
               {narrativeOrgs.map(({ name, id }: OrgInfo) => (
-                <a href={`/dev/#orgs/${id}`}>
+                <a key={id} href={`/dev/#orgs/${id}`}>
                   <FAIcon icon={faArrowUpRightFromSquare} />
-                  <li key={id}>{name}</li>
+                  <li>{name}</li>
                 </a>
               ))}
             </ul>
           </>
         )}
-        <Button onClick={yesFactory({ orgSelected })}>OK</Button>
+        <Button onClick={linkOrg({ orgSelected })}>OK</Button>
         <Button onClick={no}>Cancel</Button>
       </div>
     </>
